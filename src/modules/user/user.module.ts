@@ -8,10 +8,6 @@ import { AuthService } from "./auth.service";
 @Module({
     imports: [
         SequelizeModule.forFeature([User]),
-        JwtModule.register({
-            secret: "secret-key",
-            signOptions: {expiresIn: '1h'}
-        })
     ],
     controllers: [AuthController],
     providers: [AuthService, JwtService]

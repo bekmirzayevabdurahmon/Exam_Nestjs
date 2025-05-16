@@ -4,14 +4,36 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import path from 'path';
 import { UserModule } from './modules/user';
 import { APP_GUARD } from '@nestjs/core';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ProductModule } from './modules/product/product.module';
+import { JwtModule, JwtService } from '@nestjs/jwt';
+import { CheckAuthGuard, CheckRolesGuard } from './gurds';
+import { JwtHelper } from './helpers';
 
 console.log(process.env.DB_HOST)
+console.log(process.env.ACCESS_TOKEN_SECRET)
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
+ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '.env', 
+    }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => {
+        const secret = configService.get<string>('ACCESS_TOKEN_SECRET');
+        console.log('JWT Secret from ConfigService:', secret); 
+        if (!secret) {
+          throw new Error('ACCESS_TOKEN_SECRET is not defined in .env');
+        }
+        return {
+          secret,
+          signOptions: { expiresIn: '60m' },
+          global: true, 
+        };
+      },
+      inject: [ConfigService],
     }),
     SequelizeModule.forRoot({
       dialect: 'postgres',
@@ -27,6 +49,20 @@ console.log(process.env.DB_HOST)
       autoLoadModels: true
     }),
     UserModule,
+    ProductModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: CheckAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: CheckRolesGuard,
+    },
+    JwtHelper,
+    JwtService,
   ],
 })
+
 export class AppModule {}

@@ -28,4 +28,5 @@ export class registerDto {
     @MaxLength(20)
     @IsString()
     password: string;
+
 }

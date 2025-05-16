@@ -1,7 +1,7 @@
 import { Column, DataType, Model, Table } from "sequelize-typescript";
 import { ProductStatus } from "../enums";
 
-@Table({ tableName: "Product", timestamps: true })
+@Table({ tableName: "products", timestamps: true })
 export class Product extends Model{
     
 @Column({ type: DataType.TEXT})
@@ -29,5 +29,5 @@ stock: number;
 status: string;
 
 @Column({ type: DataType.TEXT})
-image_url: string;
+image: string;
 }
