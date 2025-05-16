@@ -81,8 +81,6 @@ export class AuthService implements OnModuleInit{
             throw new ConflictException("User paroli mavjuda emas")
         }
 
-        // const accessToken = this.jwtService.sign({ id: user.id, role: user.role})
-
         return {
             message: "success",
             data: {
